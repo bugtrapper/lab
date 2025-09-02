@@ -1,4 +1,5 @@
 .. author:: ezra <ezra@posteo.de>
+.. author:: corny <corny@uber.space>
 
 .. tag:: lang-nodejs
 .. tag:: web
@@ -210,7 +211,7 @@ Best practices
 Personalization
 ---------------
 
-Take a deeper look into the ``~/etherpad/settings.json``, you still might want to adjust the title or the welcoming text of new created pads. If you want to use plugins, you will also need to set up an admin account there. If you've updated the settings, you need to restart etherpad using ``supervisorctl restart etherpad``.
+Take a deeper look into the ``~/etherpad/settings.json``, you still might want to adjust the title or the welcoming text of new created pads. If you want to install and manage plugins with the UI, you will also need to set up an admin account there. If you've updated the settings, you need to restart etherpad using ``supervisorctl restart etherpad``.
 
 You can also personalize the look of your installation by using your own skin or change an existing one. See `Skins`_ in the documentation for further information.
 
@@ -218,39 +219,80 @@ Updates
 =======
 
 .. note:: Check the update feed_ regularly to stay informed about the newest version.
+If you're using plug-ins, make a note of your current etherpad version and installed plug-ins so you can easily re-install them after the update. A list of the installed plug-ins can be found under ``~/etherpad/var/installed_plugins.json``. Please note that updates can break plug-in compatibility, especially if the plug-ins haven't been updated for a while. 
 
-
-If there is a new version available, you can get the code using git. Replace the pseudo version number ``2.0.3`` with the latest version number you got from the release feed_:
+Back up your settings: 
 
 .. code-block:: console
 
-  [isabell@stardust ~]$ cd ~/etherpad
-  [isabell@stardust etherpad]$ git checkout  -- src/package.json
-  [isabell@stardust etherpad]$ git pull origin 2.0.3
-  From https://github.com/ether/etherpad-lite
-   * tag                 2.0.3      -> FETCH_HEAD
-  Updating b8b2e4bc..96ac381a
-  Fast-forward
-  […]
+  [isabell@stardust ~]$ cp etherpad/settings.json ~/ 
   [isabell@stardust ~]$
 
-Update the dependencies.
+Stop the etherpad service:
 
 .. code-block:: console
 
-  [isabell@stardust ~]$ ~/etherpad/bin/installDeps.sh
-  […]
-  [isabell@stardust ~]$
-
-
-Then you need to restart the service daemon, so the new code is used by the web server:
-
-.. code-block:: console
-
-  [isabell@stardust ~]$ supervisorctl restart etherpad
+  [isabell@stardust ~]$ supervisorctl stop etherpad
   etherpad: stopped
+  [isabell@stardust ~]$
+
+Remove the etherpad installation: 
+
+.. code-block:: console
+
+  [isabell@stardust ~]$ rm -r etherpad
+  [isabell@stardust ~]$
+
+Replace the pseudo version number ``2.0.3`` with the latest version number you got from the release feed_:
+
+.. code-block:: console
+
+  [isabell@stardust ~]$ git clone --branch 2.0.3 --depth=1 https://github.com/ether/etherpad-lite ~/etherpad
+  Cloning into '/home/isabell/etherpad'...
+  remote: Enumerating objects: 504, done.
+  remote: Counting objects: 100% (504/504), done.
+  remote: Compressing objects: 100% (486/486), done.
+  remote: Total 504 (delta 22), reused 143 (delta 1), pack-reused 0
+  Receiving objects: 100% (504/504), 3.50 MiB | 7.56 MiB/s, done.
+  Resolving deltas: 100% (22/22), done.
+  Note: checking out '62101147a0c3495dc80daa87ab53a3366321a205'.
+
+  You are in 'detached HEAD' state. You can look around, make experimental
+  changes and commit them, and you can discard any commits you make in this
+  state without impacting any branches by performing another checkout.
+
+  If you want to create a new branch to retain commits you create, you may
+  do so (now or later) by using -b with the checkout command again. Example:
+
+    git checkout -b <new-branch-name>
+
+  […]
+  [isabell@stardust ~]$
+
+Move your settings file into the new installation: 
+
+.. code-block:: console
+
+  [isabell@stardust ~]$ mv ~/settings.json etherpad/ 
+  [isabell@stardust ~]$
+
+Run etherpad once via the shell script to update the dependencies and create the Admin UI:
+
+.. code-block:: console
+
+  [isabell@stardust ~]$ ~/etherpad/bin/run.sh
+  […]
+  ^C[isabell@stardust ~]$
+
+Start the etherpad service again: 
+
+.. code-block:: console
+
+  [isabell@stardust ~]$ supervisorctl start etherpad
   etherpad: started
   [isabell@stardust ~]$
+
+
 
 
 .. _`Etherpad Lite`: http://etherpad.org/
@@ -260,6 +302,6 @@ Then you need to restart the service daemon, so the new code is used by the web 
 
 ----
 
-Tested with Etherpad Lite 2.0.3 and Uberspace 7.15.14
+Tested with Etherpad Lite 2.5.0 and Uberspace 7.16.8.0
 
 .. author_list::
