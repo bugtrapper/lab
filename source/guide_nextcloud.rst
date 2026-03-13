@@ -40,12 +40,12 @@ Nextcloud was initially released in 2016 as a fork of ownCloud_ and is maintaine
 Prerequisites
 =============
 
-Use the recommended :manual:`PHP <lang-php>` version as listed in the `system requirements`_:
+Use :manual:`PHP 8.4 or later<lang-php>`. The `system requirements` recommend PHP 8.3, but we need a current version of libcurl, wich is only included in PHP 8.4 and later versions on Uberspace:
 
 .. code-block:: console
 
- [isabell@stardust ~]$ uberspace tools version use php 8.2
- Selected PHP version 8.2
+ [isabell@stardust ~]$ uberspace tools version use php 8.4
+ Selected PHP version 8.4
  The new configuration is adapted immediately. Patch updates will be applied automatically.
  [isabell@stardust ~]$
 
@@ -173,6 +173,19 @@ Now, execute the Nextcloud maintenance PHP script ``occ`` with the parameters sh
   [isabell@stardust html]$ php occ maintenance:install --admin-user="${NEXTCLOUD_ADMIN_USER}" --admin-pass="${NEXTCLOUD_ADMIN_PASS}" --database='mysql' --database-name="${USER}_nextcloud"  --database-user="${USER}" --database-pass="${MYSQL_PASSWORD}" --data-dir="${HOME}/nextcloud_data"
   Nextcloud was successfully installed
   [isabell@stardust html]$
+
+Set the adming user email address
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Set the mail address of the admin user in order to prepare sending mails and receive administration notifications later on.
+
+.. code-block:: console
+  :emphasize-lines: 1
+
+  [isabell@stardust html]$ php occ user:setting $NEXTCLOUD_ADMIN_USER settings email "$USER@uber.space"
+  [isabell@stardust html]$
+
+
 
 Set the "trusted" domain
 ^^^^^^^^^^^^^^^^^^^^^^^^
@@ -487,6 +500,25 @@ The update to Nextcloud 21.0.1 may fail with the following error message:
 
 To solve the issue, apply the ``apc.enable_cli=1`` step above to your installation.
 
+Update fails with "Undefined constant CURL_HTTP_VERSION_2TLS"
+------------------------------------------------------------
+
+The update to Nextcloud 33.0.0 may fail with the following error message:
+
+.. code-block:: console
+
+   Error: Undefined constant "CURL_HTTP_VERSION_2TLS" in /var/www/virtual/nsv/html/nextcloud/lib/private/Http/Client/Client.php:62
+
+The reason is most probably an outdated PHP version. You need to use PHP 8.4 for the update to work:
+
+.. code-block:: console
+
+ [isabell@stardust ~]$ uberspace tools version use php 8.4
+ Selected PHP version 8.4
+ The new configuration is adapted immediately. Patch updates will be applied automatically.
+ [isabell@stardust ~]$
+
+
 Contacts app hangs
 ------------------
 
@@ -511,6 +543,6 @@ You need to reapply these changes after you installed Nextcloud updates or after
 
 ----
 
-Tested with Nextcloud 27.0.0, Uberspace 7.15.2, PHP 8.2
+Tested with Nextcloud 32.0.3, Uberspace 7.16.9, PHP 8.3.8
 
 .. author_list::

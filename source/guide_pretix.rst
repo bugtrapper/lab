@@ -95,7 +95,7 @@ Now you need to set up the configuration, create the file ``~/.pretix.cfg`` and 
 .. warning:: Be sure, to replace all values with correct data of your own Uberspace account!
 
 .. code-block:: ini
-  :emphasize-lines: 2,3,5,10,11,12,17,18,21,22,23,24,25
+  :emphasize-lines: 2,3,5,10,11,12,17,18,21,25,26,27,28
 
     [pretix]
     instance_name=Isabells pretix
@@ -116,6 +116,10 @@ Now you need to set up the configuration, create the file ``~/.pretix.cfg`` and 
     broker=redis+socket:///home/isabell/.redis/sock
     backend=redis+socket:///home/isabell/.redis/sock
 
+    [redis]
+    location=unix:///home/isabell/.redis/sock?db=0
+    sessions=true
+
     [mail]
     from=isabell@uber.space
     host=stardust.uberspace.de
@@ -123,6 +127,12 @@ Now you need to set up the configuration, create the file ``~/.pretix.cfg`` and 
     password=MySuperSecretPassword
     port=587
     tls=on
+
+    [redis]
+    # use the Redis UNIX socket; pick a DB number you reserve for pretix caches/sessions
+    location=unix:///home/isabell/.redis/sock?db=1
+    # store Django sessions in Redis too (recommended)
+    sessions=true
 
 
 Initialize database
